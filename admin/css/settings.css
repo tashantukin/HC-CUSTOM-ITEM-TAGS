@@ -1,0 +1,15 @@
+.icon-3x.icon.icon-rrp{background: url(../images/rrp.svg) no-repeat 0 0;background-size: contain;}
+.grey-btn{ background-color: #999; height: 40px;width: 140px;max-width: 100%; color: #fff; border: none; display: inline-block;text-align: center;line-height: 40px;vertical-align: middle;cursor: pointer; margin-right: 10px; }
+.save-btn { background-color: #50c8ff; height: 40px; width: 150px; max-width: 100%; color: #fff; border: none; display: inline-block; text-align: center; line-height: 40px;}
+
+.btn-info-plug-in {
+    color: #50c8ff;
+    display: block;
+    height: 30px;
+    text-align: right;
+    width: 190px;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: 'Open Sans';
+}
+
