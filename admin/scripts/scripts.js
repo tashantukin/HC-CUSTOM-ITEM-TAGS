@@ -33,15 +33,7 @@ var code = "";
   $(document).ready(function ()
   {
   
-    jQuery('.login-list-item .tog').click(function () {
-      jQuery(this).closest('.login-list-item').toggleClass("open");
-  });
-
-  //toggle per item
-  jQuery('.tog1').click(function () {
-    jQuery(this).closest('.accord_item').toggleClass("open");
-});
-
+  
 
   getMarketplaceCustomFields(function(result) {
       $.each(result, function(index, cf) {
