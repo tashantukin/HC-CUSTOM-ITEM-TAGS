@@ -392,3 +392,119 @@
 .item-pagination.text-right .pagination {
     justify-content: end;
 }
+
+
+.item-discounted-deal {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background: #F8F9FA;
+}
+
+.item-discounted-title {
+    display: flex;
+    justify-content: space-between;
+}
+
+.item-discounted-title h2 {
+    font-weight: 800;
+    font-size: 38px;
+    color: #22252A;
+    margin-bottom: 40px;
+}
+
+.item-deal-box {
+    padding: 20px;
+    background-color: #fff;
+    text-align: center;
+    margin: auto;
+    border-radius: 9px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.item-deal-box .badge {
+    position: absolute;
+    left: 0;
+    top: 0;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 5px 10px;
+}
+
+.item-deal-box .badge {
+    color: #FFFFFF;
+    background-color: transparent;
+    background-image: url(../images/home-credit-apple-badge-danger.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.item-deal-box img {
+    margin: auto;
+    margin-bottom: 20px;
+}
+
+.item-deal-box h3 {
+    font-size: 16px;
+    color: #474A4E;
+    margin-bottom: 0px;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.item-deal-box h5 {
+    font-size: 14px;
+    color: #7BBC89;
+    margin-bottom: 20px;
+}
+
+.item-deal-box .btn-buy {
+    font-weight: bold;
+    font-size: 14px;
+    color: #D73A3E;
+}
+
+.item-deal-box .btn-buy .fa {
+    margin-left: 5px;
+}
+
+.item-discounted-title .item-view-more {
+    float: right;
+    min-width: 80px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #6FB77F;
+}
+
+.item-discounted-deal.width-20 .col-sm-2 {
+    width: 20%;
+}
+
+/******similar-listings-slider******/
+.similar-listings-slider .slick-dots li {
+    width: auto;
+    height: auto;
+    margin: 0 5px;
+}
+
+.similar-listings-slider .slick-dots li button {
+    width: 36px;
+    height: 5px;
+    padding: 0;
+}
+
+.similar-listings-slider .slick-dots li button:before {
+    width: 36px;
+    height: 5px;
+    background-color: #EAECEF;
+    opacity: 1;
+    content: '';
+}
+
+.similar-listings-slider .slick-dots li.slick-active button:before {
+    background-color: #D73A3E;
+}

@@ -9,7 +9,7 @@
   var hostname = window.location.hostname;
   var urls = window.location.href.toLowerCase();
   var userId = $("#userGuid").val();
-
+  var selectedCategories = [];
   
   function waitForElement(elementPath, callBack) {
     window.setTimeout(function () {
@@ -141,7 +141,6 @@
 
   })()
 
-  
  //custom search
   var customSearchFilter = (function ()
   {
@@ -152,7 +151,9 @@
       {
         var apiUrl = `/api/v2/items`;
         console.log(apiUrl);
-        var data = { 'CustomFieldQueries': [{ 'Code': customGroupCode, 'Operator': "gte", "Value": "0" }] }
+        var val = customGroupName == 'Brands' ? selectedCategories.toString() : "0"
+        var operator = customGroupName == 'Brands' ? "in" : "gte"
+        var data = { 'CustomFieldQueries': [{ 'Code': customGroupCode, 'Operator': operator, "Value": val  }] }
         console.log({ data });
         $.ajax({
         url: apiUrl,
@@ -365,10 +366,165 @@
        });
 
       }
+
+      async function searchByCategory(categoryGuid)
+      {
+        var apiUrl = `/api/v2/items`;
+        console.log(apiUrl);
+        var data = { 'Categories': [ categoryGuid ] }
+        console.log({ data });
+        $.ajax({
+        url: apiUrl,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (result) {
+          if (result) {
+            var allItems = result;
+            $('.item-list-panel .row').empty();
+
+            var totalItems = result.TotalRecords
+            var paginationcount = Math.ceil(result.TotalRecords / result.PageSize)
+            console.log({ totalItems })
+            console.log({ paginationcount })
+            
+             var i = 1;
+            var pagination_list = "";
+             $(`.pagination .list`).remove();
+            while (i <= paginationcount) {
+              if (i == 1) {
+
+                pagination_list += `<li class="active list" id="first-page" indx= ${i}><a href="javascript:void(0);">${i}</a></li>`; 
+                $(`.pagination li`).last().before(pagination_list);
+              } else {
+                pagination_list += `<li indx= ${i} class="list"><a href="javascript:void(0);">${i}</a></li>`
+                $(`.pagination li`).last().before(pagination_list);
+              }
+              i++;
+            }
+
+            $.each(result.Records, function (index, item)
+            {
+              var discountValue = '';
+              var itemNameSlug = string_to_slug(item['Name']);
+              itemNameSlug = '/user/item/detail/' + itemNameSlug + '/' + item['ID'];
+                $.each(item.CustomFields, function (index, cf)
+                {
+                  
+                  if (cf.Code == '1-ItemDiscount-NbXS5gF2ye') {
+                    discountValue = cf.Values[0];
+                    
+                    
+                  }
+                });
+              let discountBanner = discountValue != "" ? `<span class="badge badge-danger">-${discountValue}% OFF</span>` : ''
+              
+               let itemDetails = `<div class="col-sm-6">
+                            <div class="item-search-box">
+                                 ${discountBanner}<img src="${item['Media'][0]['MediaUrl']}" class="img-responsive">
+                                 <div class="search-description">
+                                  <h3>${item['Name']}</h3>
+                                  <h5>as low as Php ${formatter.format(item['Price'])} / month</h5>
+                                  <a class="btn-buy" href="${itemNameSlug}">Buy Now <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+                                 </div>
+                            </div>
+                        </div>`
+               
+             // customGroupName == 'Discounted' ?  $('.discounted .container .row').append(itemDetails) : $('.trending .container .row').append(itemDetails) ;
+              
+              $('.item-list-panel .row').append(itemDetails);
+                    
+            })
+
+        
+          }
+        },
+       });
+      }
+ 
+      async function filterItemsByRange(min, max)
+      {
+        var apiUrl = `/api/v2/items`;
+        console.log(apiUrl);
+        var data = { 'minPrice': min, 'maxPrice' : max}
+        console.log({ data });
+        $.ajax({
+        url: apiUrl,
+        method: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (result) {
+          if (result) {
+            var allItems = result;
+            $('.item-list-panel .row').empty();
+
+            var totalItems = result.TotalRecords
+            var paginationcount = Math.ceil(result.TotalRecords / result.PageSize)
+            console.log({ totalItems })
+            console.log({ paginationcount })
+            
+             var i = 1;
+            var pagination_list = "";
+             $(`.pagination .list`).remove();
+            while (i <= paginationcount) {
+              if (i == 1) {
+
+                pagination_list += `<li class="active list" id="first-page" indx= ${i}><a href="javascript:void(0);">${i}</a></li>`; 
+                $(`.pagination li`).last().before(pagination_list);
+              } else {
+                pagination_list += `<li indx= ${i} class="list"><a href="javascript:void(0);">${i}</a></li>`
+                $(`.pagination li`).last().before(pagination_list);
+              }
+              i++;
+            }
+
+            $.each(result.Records, function (index, item)
+            {
+              var discountValue = '';
+              var itemNameSlug = string_to_slug(item['Name']);
+              itemNameSlug = '/user/item/detail/' + itemNameSlug + '/' + item['ID'];
+                $.each(item.CustomFields, function (index, cf)
+                {
+                  
+                  if (cf.Code == '1-ItemDiscount-NbXS5gF2ye') {
+                    discountValue = cf.Values[0];
+                    
+                    
+                  }
+                });
+              let discountBanner = discountValue != "" ? `<span class="badge badge-danger">-${discountValue}% OFF</span>` : ''
+              
+               let itemDetails = `<div class="col-sm-6">
+                            <div class="item-search-box">
+                                 ${discountBanner}<img src="${item['Media'][0]['MediaUrl']}" class="img-responsive">
+                                 <div class="search-description">
+                                  <h3>${item['Name']}</h3>
+                                  <h5>as low as Php ${formatter.format(item['Price'])} / month</h5>
+                                  <a class="btn-buy" href="${itemNameSlug}">Buy Now <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+                                 </div>
+                            </div>
+                        </div>`
+               
+             // customGroupName == 'Discounted' ?  $('.discounted .container .row').append(itemDetails) : $('.trending .container .row').append(itemDetails) ;
+              
+              $('.item-list-panel .row').append(itemDetails);
+                    
+            })
+
+        
+          }
+        },
+       });
+      }
+
+
+
       return {
         searchTaggedItems: searchTaggedItems,
         filterItems: filterItems,
-        filterItemsByKeyword:filterItemsByKeyword
+        filterItemsByKeyword: filterItemsByKeyword,
+        searchByCategory: searchByCategory,
+        filterItemsByRange : filterItemsByRange
       }
     }
       return {
@@ -387,13 +543,78 @@
   })()
 
 
+ var itemCustomFields  = (function ()
+  {
+    var instance;
+    function init()
+    {
+      async function getCustomFields(itemGuid)
+      {
+       
+        var apiUrl = `/api/v2/items/${itemGuid}`;
+        $.ajax({
+        url: apiUrl,
+        method: "GET",
+        contentType: "application/json",
+       // data: JSON.stringify(data),
+        success: function (result) {
+          if (result) {
+           
+            $.each(result.CustomFields, function (index, cf)
+            {
+              var customValue = `<div class="details-container" onclick="showDescFull(this)">
+								<div class="details-title">${cf.Name}</div>
+								<div class="details-content">${cf.Values[0]}</div>
+								<i class="icon icon-down-black"></i>
+							</div>`
+              switch (cf.Name) {
+                case ('WEIGHT'):
+                  
+                  cf.Values[0] != null ? $('.product-descriptions').parent('div').append(customValue) : ''
+                  break;
+                
+
+                 case ('Brands'):
+                  
+                  cf.Values[0] != null ? $('.product-descriptions').parent('div').append(customValue) : ''
+                  break;
+              }
+            })
+
+        
+          }
+        },
+       });
+      }
+      
+
+     
+      return {
+        getCustomFields: getCustomFields,
+        
+      }
+    }
+      return {
+        getInstance: function ()
+        {
+          if (!instance) {
+          
+              instance = init()
+          
+          }
+          
+          return instance
+        }
+      }
+
+  })()
+
   $(document).ready(function () {
     getMarketplaceCustomFields(function (result) {
       $.each(result, function (index, cf) {
        
       });
     });
-
 
     //homepage
     if (document.body.className.includes('page-home')) {
@@ -468,31 +689,57 @@
                                         </div>
                                         <div id="monthlyInstallment" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="MIheadingOne">
                                             <div class="panel-body">
-                                                <div class="radio-checkbox-custom">
+                                              
+                                               <div class="radio-checkbox-custom">
                                                     <div class="radio">
-                                                        <label><input type="radio" name="monthly_installment" value="Php 500 - 2,500"><span class="indicator"></span>Php 500 - 2,500</label>
+                                                        <label><input type="radio" name="monthly_installment" value="Php 500 - 2,000"><span class="indicator"></span>Php 500 - 2,000</label>
                                                     </div>
                                                 </div>
+
+
                                                 <div class="radio-checkbox-custom">
                                                     <div class="radio">
                                                         <label><input type="radio" name="monthly_installment" value="Php 2,001 - 4,000"><span class="indicator"></span>Php 2,001 - 4,000</label>
                                                     </div>
                                                 </div>
+
+
+
                                                 <div class="radio-checkbox-custom">
                                                     <div class="radio">
                                                         <label><input type="radio" name="monthly_installment" value="Php 4,001 - 6,000"><span class="indicator"></span>Php 4,001 - 6,000</label>
                                                     </div>
                                                 </div>
-                                                <div class="radio-checkbox-custom">
+
+
+                                                 <div class="radio-checkbox-custom">
                                                     <div class="radio">
                                                         <label><input type="radio" name="monthly_installment" value="Php 6,001 - 8,000"><span class="indicator"></span>Php 6,001 - 8,000</label>
                                                     </div>
                                                 </div>
+
+
                                                 <div class="radio-checkbox-custom">
                                                     <div class="radio">
-                                                        <label><input type="radio" name="monthly_installment" value="Php 8,001 and up"><span class="indicator"></span>Php 8,001 and up</label>
+                                                        <label><input type="radio" name="monthly_installment" value="Php 8,001 - 10,000"><span class="indicator"></span>Php 8,001 - 10,000</label>
                                                     </div>
                                                 </div>
+                                                <div class="radio-checkbox-custom">
+                                                    <div class="radio">
+                                                        <label><input type="radio" name="monthly_installment" value="Php 10,001 - 20,000"><span class="indicator"></span>Php 10,001 - 20,000</label>
+                                                    </div>
+                                                </div>
+                                                <div class="radio-checkbox-custom">
+                                                    <div class="radio">
+                                                        <label><input type="radio" name="monthly_installment" value="Php 30,001 - 40,000"><span class="indicator"></span>Php 30,001 - 40,000</label>
+                                                    </div>
+                                                </div>
+                                                <div class="radio-checkbox-custom">
+                                                    <div class="radio">
+                                                        <label><input type="radio" name="monthly_installment" value="Php 40,001 and up"><span class="indicator"></span>Php 40,001 and up</label>
+                                                    </div>
+                                                </div>
+                                               
                                             </div>
                                         </div>
                                     </div>
@@ -542,45 +789,70 @@
                                         </div>
                                         <div id="brands" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="BheadingTwo">
                                             <div class="panel-body">
+
+                                              <div class="radio-checkbox-custom">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                          <input type="checkbox" value="Acer" ><span class="indicator"></span> Acer
+                                                        </label>
+                                                      </div>
+                                                </div>
+
+                                                 <div class="radio-checkbox-custom">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                          <input type="checkbox" value="Lenovo" ><span class="indicator"></span> Lenovo
+                                                        </label>
+                                                      </div>
+                                                </div>
+
+                                                 <div class="radio-checkbox-custom">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                          <input type="checkbox" value="Asus" ><span class="indicator"></span> Asus
+                                                        </label>
+                                                      </div>
+                                                </div>
+
                                                 <div class="radio-checkbox-custom">
                                                     <div class="checkbox">
                                                         <label>
-                                                          <input type="checkbox"><span class="indicator"></span> Samsung
+                                                          <input type="checkbox" value="Samsung"><span class="indicator"></span> Samsung
                                                         </label>
                                                       </div>
                                                 </div>
                                                 <div class="radio-checkbox-custom">
                                                     <div class="checkbox">
                                                         <label>
-                                                          <input type="checkbox"><span class="indicator"></span> Apple
+                                                          <input type="checkbox"  value="Apple"><span class="indicator"></span> Apple
                                                         </label>
                                                       </div>
                                                 </div>
                                                 <div class="radio-checkbox-custom">
                                                     <div class="checkbox">
                                                         <label>
-                                                          <input type="checkbox"><span class="indicator"></span> Oppo
+                                                          <input type="checkbox"  value="Oppo"><span class="indicator"></span> Oppo
                                                         </label>
                                                       </div>
                                                 </div>
                                                 <div class="radio-checkbox-custom">
                                                     <div class="checkbox">
                                                         <label>
-                                                          <input type="checkbox"><span class="indicator"></span> LG
+                                                          <input type="checkbox" value="LG"><span class="indicator"></span> LG
                                                         </label>
                                                       </div>
                                                 </div>
                                                 <div class="radio-checkbox-custom">
                                                     <div class="checkbox">
                                                         <label>
-                                                          <input type="checkbox"><span class="indicator"></span> RealMe
+                                                          <input type="checkbox" value="RealMe" ><span class="indicator"></span> RealMe
                                                         </label>
                                                       </div>
                                                 </div>
                                                 <div class="radio-checkbox-custom">
                                                     <div class="checkbox">
                                                         <label>
-                                                          <input type="checkbox"><span class="indicator"></span> Whirpool
+                                                          <input type="checkbox" value="Whirpool"><span class="indicator"></span> Whirpool
                                                         </label>
                                                       </div>
                                                 </div>
@@ -670,6 +942,13 @@
         customFilter.filterItemsByKeyword(keyName)
     }
     
+    var categoryId = getParameterByName('categoryid');  
+      if (categoryId) {
+        //$('#KeyWords').val(keyName) 
+            var customFilter = customSearchFilter.getInstance();
+            customFilter.searchByCategory(categoryId)
+        }
+    
 
     jQuery(".sort-item-box").click(function ()
     {
@@ -689,7 +968,6 @@
       customFilter.searchTaggedItems('Trending', '1-Trendinginmarketplace-M4GEfJ6lwt');
     })
 
-    
      jQuery(".best-sellers").click(function ()
     {
       var customFilter = customSearchFilter.getInstance();
@@ -725,6 +1003,79 @@
  
     })
 
+
+    //filter monthly
+
+    jQuery("#monthlyInstallment .radio-checkbox-custom").click(function ()
+    { 
+      var price = $(this).find('input').val();
+      
+      switch (price) {
+
+        case ("Php 500 - 2,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('500','2000');
+          break;
+        case ("Php 2,001 - 4,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('2001','4000');
+          break;
+        
+        case ("Php 4,001 - 6,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('4001','6000');
+          break;
+        
+        case ("Php 6,001 - 8,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('6001','8000');
+          break;
+
+
+        case ("Php 8,001 - 10,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('8000','10000');
+          break;
+        case ("Php 10,001 - 20,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('10001','20000');
+          break;
+      
+        case ("Php 30,001 - 40,000"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('30001','40000');
+          break;
+      
+        case ("Php 40,001 and up"):
+          var itemFilter = customSearchFilter.getInstance();
+          itemFilter.filterItemsByRange('40000','100000000');
+          break;
+
+      }
+ 
+    })
+
+    
+     //filter by brands
+    
+    $('#brands').find('input[type=checkbox]').change(function ()
+    {
+      
+      selectedCategories = []
+      $('#brands').find('input[type=checkbox]').each(function ()
+      {
+       
+        this.checked ? selectedCategories.push($(this).val()) : "";
+        console.log({ selectedCategories })
+        
+       
+      });
+
+       var customFilter = customSearchFilter.getInstance();
+        customFilter.searchTaggedItems('Brands', '1-Brands-qPQLmo3Bcg');
+     });
+    
+
    $(document).on('keypress', function (e)
     {
       if (e.which == 13) {
@@ -737,9 +1088,17 @@
   
   }
 
-
+  if (document.body.className.includes('item-detail-page')) {
+    waitForElement('.product-specifications', function ()
+    {
+    
+      $('.details-container').remove();
+      var customFieldData = itemCustomFields.getInstance();
+      customFieldData.getCustomFields($('#itemGuid').val())
+    })
+  
+  }
   //search  bar
-
   $('#KeyWords').prependTo('.settings-keyword');
   $('.btn-find').appendTo('.settings-keyword');
 
@@ -752,6 +1111,5 @@
         }
       }
     });
-
 
 })();
