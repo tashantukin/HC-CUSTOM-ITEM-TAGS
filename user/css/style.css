@@ -420,6 +420,7 @@
     border-radius: 9px;
     margin-bottom: 25px;
     position: relative;
+    min-height: 430px;
 }
 
 .item-deal-box .badge {
@@ -443,6 +444,8 @@
 .item-deal-box img {
     margin: auto;
     margin-bottom: 20px;
+    min-height: 250px;
+    object-fit: contain;
 }
 
 .item-deal-box h3 {

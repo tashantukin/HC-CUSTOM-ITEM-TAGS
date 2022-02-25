@@ -227,7 +227,7 @@
       async function filterItems(params)
       {
         
-        var apiUrl = `/api/v2/items?sort=${params}`;
+        var apiUrl = `/api/v2/items?sort=${params}&Keywords=${$('#KeyWords').val()}`;
         console.log(apiUrl);
         $.ajax({
         url: apiUrl,
@@ -446,7 +446,7 @@
       {
         var apiUrl = `/api/v2/items`;
         console.log(apiUrl);
-        var data = { 'minPrice': min, 'maxPrice' : max}
+        var data = { 'Keywords': $('#KeyWords').val(),'minPrice': min, 'maxPrice' : max}
         console.log({ data });
         $.ajax({
         url: apiUrl,
